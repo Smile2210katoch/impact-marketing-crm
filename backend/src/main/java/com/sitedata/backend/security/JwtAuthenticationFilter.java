@@ -36,6 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
 
+        String path = request.getServletPath();
+
+
+        // Skip JWT checking for public APIs
+        if(path.equals("/api/auth/login")
+                || path.equals("/api/users/register")) {
+
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+
+
         String header = request.getHeader("Authorization");
 
 
@@ -45,23 +58,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
 
 
-            String email = jwtService.extractEmail(token);
+            try {
+
+                String email = jwtService.extractEmail(token);
 
 
-            if(email != null) {
+                if(email != null) {
 
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                Collections.emptyList()
-                        );
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    email,
+                                    null,
+                                    Collections.emptyList()
+                            );
 
 
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authentication);
+                    SecurityContextHolder
+                            .getContext()
+                            .setAuthentication(authentication);
+                }
+
+
+            } catch(Exception e){
+
+                SecurityContextHolder.clearContext();
 
             }
 
