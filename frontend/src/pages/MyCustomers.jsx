@@ -255,52 +255,68 @@ function MyCustomers() {
 
                         {
 
-                            filteredCustomers.map(customer => (
+                            filteredCustomers.length > 0 ? (
 
-                                <tr key={customer.id}>
+                                filteredCustomers.map(customer => (
 
-                                    <td>{customer.firstName}</td>
+                                    <tr key={customer.id}>
 
-                                    <td>{customer.lastName}</td>
+                                        <td>{customer.firstName}</td>
 
-                                    <td>{customer.mobile}</td>
+                                        <td>{customer.lastName}</td>
 
-                                    <td>{customer.city}</td>
+                                        <td>{customer.mobile}</td>
 
-                                    <td>{customer.siteStage}</td>
+                                        <td>{customer.city}</td>
 
-                                    <td>{customer.source}</td>
+                                        <td>{customer.siteStage}</td>
 
-                                    <td>
+                                        <td>{customer.source}</td>
 
-    <button
-        style={styles.editButton}
-        onClick={() => openEdit(customer)}
-    >
-        Edit
-    </button>
+                                        <td>
 
-</td>
+                                            <button
+                                                style={styles.editButton}
+                                                onClick={() => openEdit(customer)}
+                                            >
+                                                Edit
+                                            </button>
 
-                                    <td>
+                                        </td>
 
-                                        <button
+                                        <td>
 
-                                            style={styles.deleteButton}
+                                            <button
+                                                style={styles.deleteButton}
+                                                onClick={() => deleteCustomer(customer.id)}
+                                            >
+                                                Delete
+                                            </button>
 
-                                            onClick={() => deleteCustomer(customer.id)}
+                                        </td>
 
-                                        >
+                                    </tr>
 
-                                            Delete
+                                ))
 
-                                        </button>
+                            ) : (
 
+                                <tr>
+                                    <td
+                                        colSpan="8"
+                                        style={{
+                                            textAlign: "center",
+                                            padding: "30px",
+                                            fontSize: "18px",
+                                            color: "#666",
+                                            fontWeight: "600"
+                                        }}
+                                    >
+                                        No customers found
                                     </td>
-
                                 </tr>
 
-                            ))
+                            )
 
                         }
 

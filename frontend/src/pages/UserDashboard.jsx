@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import PageWrapper from "../components/PageWrapper";
 import CountUp from "react-countup";
+import Footer from "../components/Footer";
 import {
 FaUser,
 FaUserFriends,
@@ -136,6 +137,8 @@ Add Customer
                 </div>
 
             </div>
+
+            <Footer />
 
         </>
 

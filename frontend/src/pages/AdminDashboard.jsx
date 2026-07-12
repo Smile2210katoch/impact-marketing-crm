@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import PageWrapper from "../components/PageWrapper";
+import Footer from "../components/Footer";
 import {
     FaUsers,
     FaUserTie,
@@ -298,6 +299,8 @@ Statistics
                 </div>
 
             </div>
+
+            <Footer />
 
             </>
 

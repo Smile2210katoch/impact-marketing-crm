@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import { FaUserCircle } from "react-icons/fa";
 import PageWrapper from "../components/PageWrapper";
+import Footer from "../components/Footer";
 function Profile() {
 
     const user = {
@@ -88,6 +89,8 @@ function Profile() {
                 </div>
 
             </div>
+
+            <Footer />
 
             </>
 

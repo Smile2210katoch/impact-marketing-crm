@@ -367,5 +367,12 @@ padding:30px 25px;
 font-size:28px;
 
 }
+.login-card button:disabled{
+
+    opacity:0.7;
+
+    cursor:not-allowed;
+
+}
 
 }

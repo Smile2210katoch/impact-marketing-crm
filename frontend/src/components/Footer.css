@@ -1,0 +1,57 @@
+.footer{
+
+    margin-top:60px;
+
+    background:#0f172a;
+
+    color:white;
+
+    text-align:center;
+
+    padding:30px 20px;
+
+}
+
+.footer-content h3{
+
+    color:#38bdf8;
+
+    margin-bottom:10px;
+
+}
+
+.footer-content p{
+
+    margin:6px 0;
+
+    color:#cbd5e1;
+
+}
+
+.footer-content span{
+
+    display:block;
+
+    margin-top:15px;
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+}
+
+@media(max-width:768px){
+
+.footer{
+
+padding:25px 15px;
+
+}
+
+.footer-content h3{
+
+font-size:22px;
+
+}
+
+}

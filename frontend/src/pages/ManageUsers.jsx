@@ -3,6 +3,8 @@ import Navbar from "../components/Navbar";
 import api from "../api/api";
 import { toast } from "react-toastify";
 import PageWrapper from "../components/PageWrapper";
+import Footer from "../components/Footer";
+import EmptyState from "../components/EmptyState";
 
 function ManageUsers() {
 
@@ -160,6 +162,19 @@ function ManageUsers() {
 
                             {
 
+                                filteredUsers.length === 0 ?
+
+                                <tr>
+                                    <td colSpan="4">
+                                        <EmptyState
+                                            title="No Users Found"
+                                            subtitle="There are no registered users."
+                                        />
+                                    </td>
+                                </tr>
+
+                                :
+
                                 filteredUsers.map(user => (
 
                                     <tr key={user.id}>
@@ -241,6 +256,8 @@ function ManageUsers() {
                 </div>
 
             </div>
+
+            <Footer />
 
             </>
 

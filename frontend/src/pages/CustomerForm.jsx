@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import Navbar from "../components/Navbar";
 import api from "../api/api";
 import PageWrapper from "../components/PageWrapper";
-
+import Footer from "../components/Footer";
 function CustomerForm() {
 
     const [form, setForm] = useState({
@@ -335,6 +335,8 @@ style={styles.input}
                 </form>
 
             </div>
+
+            <Footer />
 
             </>
 

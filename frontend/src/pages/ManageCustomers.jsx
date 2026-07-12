@@ -3,7 +3,8 @@ import Navbar from "../components/Navbar";
 import api from "../api/api";
 import { toast } from "react-toastify";
 import PageWrapper from "../components/PageWrapper";
-
+import Footer from "../components/Footer";
+import EmptyState from "../components/EmptyState";
 function ManageCustomers() {
 
     const [customers, setCustomers] = useState([]);
@@ -415,7 +416,22 @@ return (
 
                     {
 
-                        currentCustomers.map(customer=>(
+                        customers.length === 0 ?
+
+                        <tr>
+                            <td colSpan="10">
+                                <EmptyState
+                                    title="No Customers Found"
+                                    subtitle="Start by adding your first customer."
+                                    buttonText="Add Customer"
+                                    buttonLink="/customer"
+                                />
+                            </td>
+                        </tr>
+
+                        :
+
+                        customers.map(customer=>(
 
                             <tr key={customer.id}>
 
@@ -656,6 +672,8 @@ Close
             }
 
         </div>
+
+        <Footer />
 
         </>
 
