@@ -44,6 +44,13 @@ function CustomerForm() {
         });
 
     }
+    function handleImageChange(e) {
+
+    const files = Array.from(e.target.files);
+
+    setImages(files.slice(0, 5));
+
+}
     function handleChange(e) {
 
     if (e.target.name === "images") {
