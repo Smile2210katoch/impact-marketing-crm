@@ -29,7 +29,13 @@ function ManageCustomers() {
         architectMobile:"",
         siteStage:"",
         enquiryType:"",
-        source:""
+        source:"",
+        locationLink:"",
+        image1:"",
+        image2:"",
+        image3:"",
+        image4:"",
+        image5:""
 
     });
 
@@ -246,7 +252,13 @@ function ManageCustomers() {
             architectMobile:customer.architectMobile||"",
             siteStage:customer.siteStage||"",
             enquiryType:customer.enquiryType||"",
-            source:customer.source||""
+            source:customer.source||"",
+            locationLink:customer.locationLink||"",
+            image1:customer.image1||"",
+            image2:customer.image2||"",
+            image3:customer.image3||"",
+            image4:customer.image4||"",
+            image5:customer.image5||""
 
         });
 
@@ -404,7 +416,11 @@ return (
 
                         <th>Source</th>
 
-                        <th>View</th>
+<th>Location</th>
+
+<th>Images</th>
+
+<th>View</th>
                         <th>Edit</th>
                         <th>Delete</th>
 
@@ -447,11 +463,85 @@ return (
 
                                 <td>{customer.siteStage}</td>
 
-                                <td>{customer.source}</td>
+                               <td>{customer.source}</td>
 
-                                <td>
+<td>
 
-                                    <button
+    {
+
+        customer.locationLink ?
+
+        <a
+            href={customer.locationLink}
+            target="_blank"
+            rel="noreferrer"
+        >
+
+            📍 Open Map
+
+        </a>
+
+        :
+
+        "-"
+
+    }
+
+</td>
+
+<td>
+
+<div
+style={{
+display:"flex",
+gap:"5px",
+flexWrap:"wrap"
+}}
+>
+
+{[
+customer.image1,
+customer.image2,
+customer.image3,
+customer.image4,
+customer.image5
+]
+
+.filter(Boolean)
+
+.map((img,index)=>(
+
+<img
+
+key={index}
+
+src={img}
+
+alt=""
+
+style={{
+
+width:"60px",
+
+height:"60px",
+
+objectFit:"cover",
+
+borderRadius:"8px"
+
+}}
+
+/>
+
+))}
+
+</div>
+
+</td>
+
+<td>
+
+    <button
 
                                         style={styles.viewButton}
 
@@ -572,6 +662,82 @@ Next
 <p><b>Enquiry :</b> {selectedCustomer.enquiryType}</p>
 
 <p><b>Source :</b> {selectedCustomer.source}</p>
+<p>
+
+<b>Google Map :</b>
+
+{
+
+selectedCustomer.locationLink ?
+
+<a
+
+href={selectedCustomer.locationLink}
+
+target="_blank"
+
+rel="noreferrer"
+
+>
+
+ Open Map
+
+</a>
+
+:
+
+" - "
+
+}
+
+</p>
+
+<div
+style={{
+display:"flex",
+gap:"10px",
+flexWrap:"wrap",
+marginTop:"15px"
+}}
+>
+
+{[
+selectedCustomer.image1,
+selectedCustomer.image2,
+selectedCustomer.image3,
+selectedCustomer.image4,
+selectedCustomer.image5
+]
+
+.filter(Boolean)
+
+.map((img,index)=>(
+
+<img
+
+key={index}
+
+src={img}
+
+alt=""
+
+style={{
+
+width:"120px",
+
+height:"120px",
+
+borderRadius:"10px",
+
+objectFit:"cover"
+
+}}
+
+/>
+
+))}
+
+</div>
 
 <button
 
@@ -648,6 +814,13 @@ Close
                                 placeholder="Source"
                                 style={styles.input}
                             />
+                            <input
+name="locationLink"
+value={editForm.locationLink}
+onChange={handleEditChange}
+placeholder="Google Maps Link"
+style={styles.input}
+/>
 
                             <button
                                 style={styles.saveButton}

@@ -12,20 +12,28 @@ function MyCustomers() {
 
     const [editForm, setEditForm] = useState({
 
-        firstName: "",
-        lastName: "",
-        mobile: "",
-        houseNo: "",
-        street: "",
-        city: "",
-        state: "",
-        architectName: "",
-        architectMobile: "",
-        siteStage: "",
-        enquiryType: "",
-        source: ""
+    firstName: "",
+    lastName: "",
+    mobile: "",
+    houseNo: "",
+    street: "",
+    city: "",
+    state: "",
+    architectName: "",
+    architectMobile: "",
+    siteStage: "",
+    enquiryType: "",
+    source: "",
 
-    });
+    locationLink: "",
+
+    image1: "",
+    image2: "",
+    image3: "",
+    image4: "",
+    image5: ""
+
+});
 
     useEffect(() => {
 
@@ -120,7 +128,13 @@ function MyCustomers() {
             architectMobile: customer.architectMobile || "",
             siteStage: customer.siteStage || "",
             enquiryType: customer.enquiryType || "",
-            source: customer.source || ""
+            source: customer.source || "",
+            locationLink: customer.locationLink || "",
+            image1: customer.image1 || "",
+            image2: customer.image2 || "",
+            image3: customer.image3 || "",
+            image4: customer.image4 || "",
+            image5: customer.image5 || ""
 
         });
 
@@ -242,7 +256,8 @@ function MyCustomers() {
                             <th>Site Stage</th>
 
                             <th>Source</th>
-
+                            <th>Location</th>
+                            <th>Images</th>
                             <th>Edit</th>
 
                             <th>Delete</th>
@@ -273,7 +288,68 @@ function MyCustomers() {
 
                                         <td>{customer.source}</td>
 
-                                        <td>
+<td>
+
+    {
+        customer.locationLink ?
+
+        <a
+            href={customer.locationLink}
+            target="_blank"
+            rel="noreferrer"
+        >
+            📍 Open
+        </a>
+
+        :
+
+        "-"
+
+    }
+
+</td>
+
+<td>
+
+    <div
+        style={{
+            display:"flex",
+            gap:"5px",
+            flexWrap:"wrap"
+        }}
+    >
+
+        {[
+
+            customer.image1,
+            customer.image2,
+            customer.image3,
+            customer.image4,
+            customer.image5
+
+        ].filter(Boolean).map((img,index)=>(
+
+            <img
+                key={index}
+                src={img}
+                alt=""
+                style={{
+                    width:"60px",
+                    height:"60px",
+                    objectFit:"cover",
+                    borderRadius:"8px"
+                }}
+            />
+
+        ))}
+
+    </div>
+
+</td>
+
+<td>
+
+    
 
                                             <button
                                                 style={styles.editButton}
@@ -303,7 +379,7 @@ function MyCustomers() {
 
                                 <tr>
                                     <td
-                                        colSpan="8"
+                                        colSpan="10"
                                         style={{
                                             textAlign: "center",
                                             padding: "30px",

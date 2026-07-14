@@ -19,12 +19,19 @@ function CustomerForm() {
         architectMobile: "",
         siteStage: "",
         enquiryType: "",
-        source: ""
+        source: "",
+        locationLink: "",
+        image1: "",
+        image2: "",
+        image3: "",
+        image4: "",
+        image5: ""
 
     });
 
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
+    const [images, setImages] = useState([]);
 
     function handleChange(e) {
 
@@ -37,50 +44,113 @@ function CustomerForm() {
         });
 
     }
+    function handleChange(e) {
+
+    if (e.target.name === "images") {
+
+        setImages(Array.from(e.target.files).slice(0,5));
+
+        return;
+
+    }
+
+    setForm({
+
+        ...form,
+
+        [e.target.name]: e.target.value
+
+    });
+
+}
+async function uploadImage(file){
+
+    const data=new FormData();
+
+    data.append("file",file);
+
+    data.append("upload_preset","impactmarketing");
+
+    const res=await fetch(
+
+        "https://api.cloudinary.com/v1_1/jxxxnyqp/image/upload",
+
+        {
+
+            method:"POST",
+
+            body:data
+
+        }
+
+    );
+
+    return await res.json();
+
+}
 
     async function handleSubmit(e) {
 
         e.preventDefault();
+        setMessage("");
+
         if (!form.firstName.trim()) {
-    setMessage("First Name is required.");
-    return;
-}
+            setMessage("First Name is required.");
+            return;
+        }
 
-if (!form.mobile.match(/^[0-9]{10}$/)) {
-    setMessage("Enter a valid 10-digit Mobile Number.");
-    return;
-}
+        if (!form.mobile.match(/^[0-9]{10}$/)) {
+            setMessage("Enter a valid 10-digit Mobile Number.");
+            return;
+        }
 
-if (form.architectMobile &&
-    !form.architectMobile.match(/^[0-9]{10}$/)) {
-    setMessage("Architect Mobile must be 10 digits.");
-    return;
-}
+        if (form.architectMobile &&
+            !form.architectMobile.match(/^[0-9]{10}$/)) {
+            setMessage("Architect Mobile must be 10 digits.");
+            return;
+        }
 
-if (!form.city.trim()) {
-    setMessage("City is required.");
-    return;
-}
+        if (!form.city.trim()) {
+            setMessage("City is required.");
+            return;
+        }
 
-if (!form.state.trim()) {
-    setMessage("Please select a State.");
-    return;
-}
-setLoading(true);
+        if (!form.state.trim()) {
+            setMessage("Please select a State.");
+            return;
+        }
 
-        try {
+        setLoading(true);
 
-            const token = localStorage.getItem("token");
+       try {
 
-            const email = localStorage.getItem("email");
+    const token = localStorage.getItem("token");
 
-            await api.post(
+    const email = localStorage.getItem("email");
 
-                "/customers/save",
+    const uploadedImages = [];
 
-                form,
+    for (const image of images) {
 
-                {
+        const result = await uploadImage(image);
+
+        uploadedImages.push(result.secure_url);
+
+    }
+
+    form.image1 = uploadedImages[0] || "";
+    form.image2 = uploadedImages[1] || "";
+    form.image3 = uploadedImages[2] || "";
+    form.image4 = uploadedImages[3] || "";
+    form.image5 = uploadedImages[4] || "";
+
+    await api.post(
+
+        "/customers/save",
+
+        form,
+
+        {
 
                     headers: {
 
@@ -109,20 +179,30 @@ setLoading(true);
                 architectMobile: "",
                 siteStage: "",
                 enquiryType: "",
-                source: ""
+                source: "",
+                locationLink: "",
+                image1: "",
+                image2: "",
+                image3: "",
+                image4: "",
+                image5: ""
 
             });
-            
+
+            setImages([]);
 
         }
 
         catch (error) {
-            
 
             console.log(error);
 
             toast.error("Failed To Add Customer");
 
+        }
+
+        finally {
+            setLoading(false);
         }
 
     }
@@ -131,7 +211,7 @@ setLoading(true);
 
         <PageWrapper>
 
-            <>
+            <div>
 
             <Navbar />
 
@@ -315,8 +395,56 @@ style={styles.input}
 <option>Other</option>
 
 </select>
+<input
+    name="locationLink"
+    type="url"
+    placeholder="Google Maps Location Link"
+    value={form.locationLink}
+    onChange={handleChange}
+    style={styles.input}
+/>
+<div>
 
+<label style={{fontWeight:"bold"}}>
+
+Upload Site Images (Maximum 5)
+
+</label>
+
+<input
+    type="file"
+    multiple
+    accept="image/*"
+    onChange={handleImageChange}
+    style={styles.input}
+/>
+
+</div>
                     </div>
+                    {images.length > 0 && (
+                        <div
+                            style={{
+                                display:"flex",
+                                gap:"10px",
+                                flexWrap:"wrap",
+                                marginTop:"10px"
+                            }}
+                        >
+                            {images.map((image, index) => (
+                                <img
+                                    key={index}
+                                    src={URL.createObjectURL(image)}
+                                    alt="preview"
+                                    style={{
+                                        width:"120px",
+                                        height:"120px",
+                                        borderRadius:"10px",
+                                        objectFit:"cover"
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
 
                     <button
     type="submit"
@@ -338,7 +466,7 @@ style={styles.input}
 
             <Footer />
 
-            </>
+            </div>
 
         </PageWrapper>
 
