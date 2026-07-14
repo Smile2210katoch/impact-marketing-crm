@@ -669,6 +669,12 @@ const styles = {
         cursor: "pointer"
 
     }
+    ,
+    table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    tableLayout: "fixed"
+},
 
 };
 

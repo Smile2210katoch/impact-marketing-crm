@@ -135,21 +135,34 @@ async function uploadImage(file){
 
     const email = localStorage.getItem("email");
 
-    const uploadedImages = [];
+   const uploadedUrls = [];
 
-    for (const image of images) {
+for (const image of images) {
 
-        const result = await uploadImage(image);
+    const data = new FormData();
 
-        uploadedImages.push(result.secure_url);
+    data.append("file", image);
 
-    }
+    data.append("upload_preset", "impactmarketing");
 
-    form.image1 = uploadedImages[0] || "";
-    form.image2 = uploadedImages[1] || "";
-    form.image3 = uploadedImages[2] || "";
-    form.image4 = uploadedImages[3] || "";
-    form.image5 = uploadedImages[4] || "";
+    const response = await fetch(
+        "https://api.cloudinary.com/v1_1/jxxxnyqp/image/upload",
+        {
+            method: "POST",
+            body: data
+        }
+    );
+
+    const result = await response.json();
+
+    uploadedUrls.push(result.secure_url);
+}
+
+form.image1 = uploadedUrls[0] || "";
+form.image2 = uploadedUrls[1] || "";
+form.image3 = uploadedUrls[2] || "";
+form.image4 = uploadedUrls[3] || "";
+form.image5 = uploadedUrls[4] || "";
 
     await api.post(
 
