@@ -16,29 +16,21 @@ public class ExcelExportService {
 
     private final CustomerDetailsRepository repository;
 
-    public ExcelExportService(
-            CustomerDetailsRepository repository
-    ) {
-
+    public ExcelExportService(CustomerDetailsRepository repository) {
         this.repository = repository;
-
     }
 
     public ByteArrayInputStream exportCustomers() {
 
         try {
 
-            List<CustomerDetails> customers =
-                    repository.findAll();
+            List<CustomerDetails> customers = repository.findAll();
 
-            Workbook workbook =
-                    new XSSFWorkbook();
+            Workbook workbook = new XSSFWorkbook();
 
-            Sheet sheet =
-                    workbook.createSheet("Customers");
+            Sheet sheet = workbook.createSheet("Customers");
 
-            Row header =
-                    sheet.createRow(0);
+            Row header = sheet.createRow(0);
 
             header.createCell(0).setCellValue("ID");
             header.createCell(1).setCellValue("First Name");
@@ -48,13 +40,18 @@ public class ExcelExportService {
             header.createCell(5).setCellValue("Architect");
             header.createCell(6).setCellValue("Site Stage");
             header.createCell(7).setCellValue("Source");
+            header.createCell(8).setCellValue("Location Link");
+            header.createCell(9).setCellValue("Image 1");
+            header.createCell(10).setCellValue("Image 2");
+            header.createCell(11).setCellValue("Image 3");
+            header.createCell(12).setCellValue("Image 4");
+            header.createCell(13).setCellValue("Image 5");
 
             int rowNumber = 1;
 
-            for(CustomerDetails customer : customers){
+            for (CustomerDetails customer : customers) {
 
-                Row row =
-                        sheet.createRow(rowNumber++);
+                Row row = sheet.createRow(rowNumber++);
 
                 row.createCell(0).setCellValue(customer.getId());
 
@@ -72,22 +69,32 @@ public class ExcelExportService {
 
                 row.createCell(7).setCellValue(customer.getSource());
 
+                row.createCell(8).setCellValue(customer.getLocationLink() == null ? "" : customer.getLocationLink());
+
+                row.createCell(9).setCellValue(customer.getImage1() == null ? "" : customer.getImage1());
+
+                row.createCell(10).setCellValue(customer.getImage2() == null ? "" : customer.getImage2());
+
+                row.createCell(11).setCellValue(customer.getImage3() == null ? "" : customer.getImage3());
+
+                row.createCell(12).setCellValue(customer.getImage4() == null ? "" : customer.getImage4());
+
+                row.createCell(13).setCellValue(customer.getImage5() == null ? "" : customer.getImage5());
             }
 
-            ByteArrayOutputStream out =
-                    new ByteArrayOutputStream();
+            for (int i = 0; i <= 13; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
 
             workbook.write(out);
 
             workbook.close();
 
-            return new ByteArrayInputStream(
-                    out.toByteArray()
-            );
+            return new ByteArrayInputStream(out.toByteArray());
 
-        }
-
-        catch (Exception e){
+        } catch (Exception e) {
 
             throw new RuntimeException(e);
 

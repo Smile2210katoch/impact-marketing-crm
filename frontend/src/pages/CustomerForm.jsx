@@ -30,202 +30,156 @@ function CustomerForm() {
     });
 
     const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [images, setImages] = useState([]);
+const [loading, setLoading] = useState(false);
+const [images, setImages] = useState([]);
 
-    function handleChange(e) {
+function handleChange(e) {
+    setForm({
+        ...form,
+        [e.target.name]: e.target.value
+    });
+}
 
-        setForm({
-
-            ...form,
-
-            [e.target.name]: e.target.value
-
-        });
-
-    }
-    function handleImageChange(e) {
+function handleImageChange(e) {
 
     const files = Array.from(e.target.files);
 
+    console.log("Files Selected:", files);
+    console.log("Total Files:", files.length);
+
     setImages(files.slice(0, 5));
-
 }
-    function handleChange(e) {
 
-    if (e.target.name === "images") {
+async function handleSubmit(e) {
 
-        setImages(Array.from(e.target.files).slice(0,5));
+    e.preventDefault();
 
+    setMessage("");
+
+    if (!form.firstName.trim()) {
+        setMessage("First Name is required.");
         return;
-
     }
 
-    setForm({
+    if (!form.mobile.match(/^[0-9]{10}$/)) {
+        setMessage("Enter a valid 10-digit Mobile Number.");
+        return;
+    }
 
-        ...form,
+    if (
+        form.architectMobile &&
+        !form.architectMobile.match(/^[0-9]{10}$/)
+    ) {
+        setMessage("Architect Mobile must be 10 digits.");
+        return;
+    }
 
-        [e.target.name]: e.target.value
+    if (!form.city.trim()) {
+        setMessage("City is required.");
+        return;
+    }
 
-    });
+    if (!form.state.trim()) {
+        setMessage("Please select a State.");
+        return;
+    }
 
-}
-async function uploadImage(file){
+    setLoading(true);
 
-    const data=new FormData();
+    try {
 
-    data.append("file",file);
+        const token = localStorage.getItem("token");
+        const email = localStorage.getItem("email");
 
-    data.append("upload_preset","impactmarketing");
+        console.log("Images State:", images);
+        console.log("Images Count:", images.length);
 
-    const res=await fetch(
+        const uploadedUrls = [];
 
-        "https://api.cloudinary.com/v1_1/jxxxnyqp/image/upload",
+        for (const image of images) {
 
-        {
+            const data = new FormData();
 
-            method:"POST",
+            data.append("file", image);
+            data.append("upload_preset", "impactmarketing");
 
-            body:data
-
-        }
-
-    );
-
-    return await res.json();
-
-}
-
-    async function handleSubmit(e) {
-
-        e.preventDefault();
-        setMessage("");
-
-        if (!form.firstName.trim()) {
-            setMessage("First Name is required.");
-            return;
-        }
-
-        if (!form.mobile.match(/^[0-9]{10}$/)) {
-            setMessage("Enter a valid 10-digit Mobile Number.");
-            return;
-        }
-
-        if (form.architectMobile &&
-            !form.architectMobile.match(/^[0-9]{10}$/)) {
-            setMessage("Architect Mobile must be 10 digits.");
-            return;
-        }
-
-        if (!form.city.trim()) {
-            setMessage("City is required.");
-            return;
-        }
-
-        if (!form.state.trim()) {
-            setMessage("Please select a State.");
-            return;
-        }
-
-        setLoading(true);
-
-       try {
-
-    const token = localStorage.getItem("token");
-
-    const email = localStorage.getItem("email");
-
-   const uploadedUrls = [];
-
-for (const image of images) {
-
-    const data = new FormData();
-
-    data.append("file", image);
-
-    data.append("upload_preset", "impactmarketing");
-
-    const response = await fetch(
-        "https://api.cloudinary.com/v1_1/jxxxnyqp/image/upload",
-        {
-            method: "POST",
-            body: data
-        }
-    );
-
-    const result = await response.json();
-
-    uploadedUrls.push(result.secure_url);
-}
-
-form.image1 = uploadedUrls[0] || "";
-form.image2 = uploadedUrls[1] || "";
-form.image3 = uploadedUrls[2] || "";
-form.image4 = uploadedUrls[3] || "";
-form.image5 = uploadedUrls[4] || "";
-
-    await api.post(
-
-        "/customers/save",
-
-        form,
-
-        {
-
-                    headers: {
-
-                        Authorization: `Bearer ${token}`,
-
-                        email: email
-
-                    }
-
+            const response = await fetch(
+                "https://api.cloudinary.com/v1_1/jxxxnyqp/image/upload",
+                {
+                    method: "POST",
+                    body: data
                 }
-
             );
 
-            toast.success("Customer Added Successfully");
+            const result = await response.json();
 
-            setForm({
+            console.log(result);
 
-                firstName: "",
-                lastName: "",
-                mobile: "",
-                houseNo: "",
-                street: "",
-                city: "",
-                state: "",
-                architectName: "",
-                architectMobile: "",
-                siteStage: "",
-                enquiryType: "",
-                source: "",
-                locationLink: "",
-                image1: "",
-                image2: "",
-                image3: "",
-                image4: "",
-                image5: ""
-
-            });
-
-            setImages([]);
-
+            uploadedUrls.push(result.secure_url);
         }
 
-        catch (error) {
+        const customerData = {
 
-            console.log(error);
+            ...form,
 
-            toast.error("Failed To Add Customer");
+            image1: uploadedUrls[0] || "",
+            image2: uploadedUrls[1] || "",
+            image3: uploadedUrls[2] || "",
+            image4: uploadedUrls[3] || "",
+            image5: uploadedUrls[4] || ""
 
-        }
+        };
 
-        finally {
-            setLoading(false);
-        }
+        console.log(customerData);
+
+        await api.post(
+            "/customers/save",
+            customerData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    email: email
+                }
+            }
+        );
+
+        toast.success("Customer Added Successfully");
+
+        setForm({
+            firstName: "",
+            lastName: "",
+            mobile: "",
+            houseNo: "",
+            street: "",
+            city: "",
+            state: "",
+            architectName: "",
+            architectMobile: "",
+            siteStage: "",
+            enquiryType: "",
+            source: "",
+            locationLink: "",
+            image1: "",
+            image2: "",
+            image3: "",
+            image4: "",
+            image5: ""
+        });
+
+        setImages([]);
+
+    } catch (error) {
+
+        console.log(error);
+
+        toast.error("Failed To Add Customer");
+
+    } finally {
+
+        setLoading(false);
 
     }
+}
 
     return (
 

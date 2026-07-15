@@ -15,8 +15,11 @@ function ManageCustomers() {
 
     const [editingCustomer, setEditingCustomer] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedImage, setSelectedImage] = useState("");
+    const [showImage, setShowImage] = useState(false);
 
     const [editForm, setEditForm] = useState({
+   
 
         firstName:"",
         lastName:"",
@@ -489,6 +492,7 @@ return (
 
 </td>
 
+
 <td>
 
 <div
@@ -527,7 +531,16 @@ height:"60px",
 
 objectFit:"cover",
 
-borderRadius:"8px"
+borderRadius:"8px",
+cursor:"pointer"
+
+}}
+
+onClick={() => {
+
+setSelectedImage(img);
+
+setShowImage(true);
 
 }}
 
@@ -843,7 +856,62 @@ style={styles.input}
                 )
 
             }
+            {showImage && (
 
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        background: "rgba(0,0,0,0.8)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 9999
+                    }}
+                >
+
+                    <div
+                        style={{
+                            position: "relative",
+                            background: "white",
+                            padding: "20px",
+                            borderRadius: "10px"
+                        }}
+                    >
+
+                        <button
+                            onClick={() => setShowImage(false)}
+                            style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "10px",
+                                padding: "8px 12px",
+                                cursor: "pointer"
+                            }}
+                        >
+                            ✖
+                        </button>
+
+                        <img
+                            src={selectedImage}
+                            alt="Full"
+                            style={{
+                                maxWidth: "90vw",
+                                maxHeight: "80vh",
+                                borderRadius: "10px"
+                            }}
+                        />
+
+                    </div>
+
+                </div>
+
+            )}
+
+        
         </div>
 
         <Footer />

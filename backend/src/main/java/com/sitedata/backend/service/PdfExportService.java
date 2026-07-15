@@ -21,7 +21,7 @@ public class PdfExportService {
 
     public ByteArrayInputStream exportCustomers() {
 
-        Document document = new Document(PageSize.A4.rotate());
+        Document document = new Document(PageSize.A2.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
@@ -30,17 +30,37 @@ public class PdfExportService {
 
             document.open();
 
-            Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+            Font headFont = FontFactory.getFont(
+                    FontFactory.HELVETICA_BOLD,
+                    18
+            );
 
             Paragraph title = new Paragraph("Customer Report", headFont);
             title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
 
+            document.add(title);
             document.add(new Paragraph(" "));
 
-            PdfPTable table = new PdfPTable(8);
+            PdfPTable table = new PdfPTable(14);
 
             table.setWidthPercentage(100);
+
+            table.setWidths(new float[]{
+                    1f,
+                    2f,
+                    2f,
+                    2f,
+                    2f,
+                    2f,
+                    2f,
+                    2f,
+                    4f,
+                    4f,
+                    4f,
+                    4f,
+                    4f,
+                    4f
+            });
 
             table.addCell("ID");
             table.addCell("First Name");
@@ -50,6 +70,12 @@ public class PdfExportService {
             table.addCell("Architect");
             table.addCell("Stage");
             table.addCell("Source");
+            table.addCell("Location Link");
+            table.addCell("Image 1");
+            table.addCell("Image 2");
+            table.addCell("Image 3");
+            table.addCell("Image 4");
+            table.addCell("Image 5");
 
             List<CustomerDetails> customers = repository.findAll();
 
@@ -60,9 +86,17 @@ public class PdfExportService {
                 table.addCell(c.getLastName());
                 table.addCell(c.getMobile());
                 table.addCell(c.getCity());
-                table.addCell(String.valueOf(c.getArchitectName()));
-                table.addCell(String.valueOf(c.getSiteStage()));
-                table.addCell(String.valueOf(c.getSource()));
+                table.addCell(c.getArchitectName() == null ? "" : c.getArchitectName());
+                table.addCell(c.getSiteStage() == null ? "" : c.getSiteStage());
+                table.addCell(c.getSource() == null ? "" : c.getSource());
+
+                table.addCell(c.getLocationLink() == null ? "" : c.getLocationLink());
+
+                table.addCell(c.getImage1() == null ? "" : c.getImage1());
+                table.addCell(c.getImage2() == null ? "" : c.getImage2());
+                table.addCell(c.getImage3() == null ? "" : c.getImage3());
+                table.addCell(c.getImage4() == null ? "" : c.getImage4());
+                table.addCell(c.getImage5() == null ? "" : c.getImage5());
 
             }
 

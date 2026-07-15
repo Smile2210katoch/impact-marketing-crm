@@ -48,9 +48,7 @@ public class CustomerDetailsService {
     }
 
     // Get Logged In User Customers
-    public List<CustomerDetails> getUserData(
-            String email
-    ) {
+    public List<CustomerDetails> getUserData(String email) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -122,6 +120,13 @@ public class CustomerDetailsService {
     public List<CustomerDetails> getRecentCustomers() {
 
         return customerRepository.findTop5ByOrderByIdDesc();
+
+    }
+
+    // Customers By City
+    public List<CustomerDetails> getCustomersByCity(String city) {
+
+        return customerRepository.findByCity(city);
 
     }
 
