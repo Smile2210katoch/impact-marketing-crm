@@ -366,6 +366,8 @@ style={styles.input}
 
 <option>Newspaper</option>
 
+<option>Offline</option>
+
 <option>Other</option>
 
 </select>
