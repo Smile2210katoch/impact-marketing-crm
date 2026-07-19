@@ -5,7 +5,9 @@ import { motion } from "framer-motion";
 import {
     FaEnvelope,
     FaLock,
-    FaChartLine
+    FaChartLine,
+    FaEye,
+    FaEyeSlash
 } from "react-icons/fa";
 
 import api from "../api/api";
@@ -21,6 +23,7 @@ function Login() {
     });
 
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     function handleChange(e) {
 
@@ -144,13 +147,22 @@ function Login() {
                         <FaLock />
 
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             name="password"
                             placeholder="Password"
                             value={form.password}
                             onChange={handleChange}
                             required
                         />
+
+                        <button
+                            type="button"
+                            className="password-toggle"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
 
                     </div>
 

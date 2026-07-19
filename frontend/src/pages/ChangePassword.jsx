@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import api from "../api/api";
 import PageWrapper from "../components/PageWrapper";
@@ -6,6 +7,8 @@ function ChangePassword() {
 
     const [oldPassword,setOldPassword]=useState("");
     const [newPassword,setNewPassword]=useState("");
+    const [showOldPassword,setShowOldPassword]=useState(false);
+    const [showNewPassword,setShowNewPassword]=useState(false);
 
     async function changePassword(){
 
@@ -55,9 +58,11 @@ function ChangePassword() {
 
         <h1>Change Password</h1>
 
+        <div style={styles.passwordWrapper}>
+
         <input
 
-        type="password"
+        type={showOldPassword?"text":"password"}
 
         placeholder="Old Password"
 
@@ -65,13 +70,33 @@ function ChangePassword() {
 
         onChange={(e)=>setOldPassword(e.target.value)}
 
-        style={styles.input}
+        style={{...styles.input, paddingRight:"44px"}}
 
         />
 
+        <button
+
+        type="button"
+
+        style={styles.toggleButton}
+
+        onClick={()=>setShowOldPassword(prev=>!prev)}
+
+        aria-label={showOldPassword?"Hide old password":"Show old password"}
+
+        >
+
+        {showOldPassword?<FaEyeSlash/>:<FaEye/>}
+
+        </button>
+
+        </div>
+
+        <div style={styles.passwordWrapper}>
+
         <input
 
-        type="password"
+        type={showNewPassword?"text":"password"}
 
         placeholder="New Password"
 
@@ -79,9 +104,27 @@ function ChangePassword() {
 
         onChange={(e)=>setNewPassword(e.target.value)}
 
-        style={styles.input}
+        style={{...styles.input, paddingRight:"44px"}}
 
         />
+
+        <button
+
+        type="button"
+
+        style={styles.toggleButton}
+
+        onClick={()=>setShowNewPassword(prev=>!prev)}
+
+        aria-label={showNewPassword?"Hide new password":"Show new password"}
+
+        >
+
+        {showNewPassword?<FaEyeSlash/>:<FaEye/>}
+
+        </button>
+
+        </div>
 
         <button
 
@@ -127,6 +170,21 @@ input:{
 width:"100%",
 padding:"12px",
 marginBottom:"20px"
+},
+
+passwordWrapper:{
+position:"relative"
+},
+
+toggleButton:{
+position:"absolute",
+right:"10px",
+top:"10px",
+background:"transparent",
+border:"none",
+color:"#2563eb",
+cursor:"pointer",
+fontSize:"16px"
 },
 
 button:{
