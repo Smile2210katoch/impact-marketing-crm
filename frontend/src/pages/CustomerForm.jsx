@@ -277,7 +277,6 @@ async function handleSubmit(e) {
                             value={form.lastName}
                             onChange={handleChange}
                             style={styles.input}
-                            required
                         />
 
                         <input
