@@ -11,11 +11,23 @@ function ManageUsers() {
     const [users, setUsers] = useState([]);
 
     const [search, setSearch] = useState("");
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
 
     useEffect(() => {
 
         fetchUsers();
 
+    }, []);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(max-width: 768px)");
+
+        const handleResize = () => setIsMobile(mediaQuery.matches);
+
+        handleResize();
+        mediaQuery.addEventListener("change", handleResize);
+
+        return () => mediaQuery.removeEventListener("change", handleResize);
     }, []);
 
     async function fetchUsers() {
@@ -120,7 +132,7 @@ function ManageUsers() {
 
             <div style={styles.container}>
 
-                <h1 style={styles.heading}>
+                <h1 style={{ ...styles.heading, fontSize: isMobile ? "24px" : "32px" }}>
 
                     Impact Marketing - Manage Users
 
@@ -128,7 +140,7 @@ function ManageUsers() {
 
                 <input
 
-                    style={styles.search}
+                    style={{ ...styles.search, width: isMobile ? "100%" : "100%" }}
 
                     placeholder="Search by Name, Email or Role"
 
@@ -138,122 +150,150 @@ function ManageUsers() {
 
                 />
 
-                <div style={styles.tableContainer}>
+                {isMobile ? (
+                    <div style={styles.cardsList}>
+                        {filteredUsers.length === 0 ? (
+                            <div style={styles.emptyState}>
+                                <EmptyState
+                                    title="No Users Found"
+                                    subtitle="There are no registered users."
+                                />
+                            </div>
+                        ) : (
+                            filteredUsers.map(user => (
+                                <div key={user.id} style={styles.userCard}>
+                                    <div style={styles.cardRow}><span style={styles.cardLabel}>Name</span><span>{user.name}</span></div>
+                                    <div style={styles.cardRow}><span style={styles.cardLabel}>Email</span><span>{user.email}</span></div>
+                                    <div style={styles.cardRow}><span style={styles.cardLabel}>Role</span><span style={user.role === "ADMIN" ? styles.admin : styles.user}>{user.role}</span></div>
+                                    <div style={styles.cardActions}>
+                                        {user.role === "ADMIN" ? (
+                                            <button style={styles.disabled} disabled>Protected</button>
+                                        ) : (
+                                            <button style={styles.deleteButton} onClick={() => deleteUser(user.id)}>Delete</button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                ) : (
+                    <div style={styles.tableContainer}>
 
-                    <table style={styles.table}>
+                        <table style={styles.table}>
 
-                        <thead>
-
-                            <tr>
-
-                                <th>Name</th>
-
-                                <th>Email</th>
-
-                                <th>Role</th>
-
-                                <th>Action</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {
-
-                                filteredUsers.length === 0 ?
+                            <thead>
 
                                 <tr>
-                                    <td colSpan="4">
-                                        <EmptyState
-                                            title="No Users Found"
-                                            subtitle="There are no registered users."
-                                        />
-                                    </td>
+
+                                    <th>Name</th>
+
+                                    <th>Email</th>
+
+                                    <th>Role</th>
+
+                                    <th>Action</th>
+
                                 </tr>
 
-                                :
+                            </thead>
 
-                                filteredUsers.map(user => (
+                            <tbody>
 
-                                    <tr key={user.id}>
+                                {
 
-                                        <td>{user.name}</td>
+                                    filteredUsers.length === 0 ?
 
-                                        <td>{user.email}</td>
+                                    <tr>
+                                        <td colSpan="4">
+                                            <EmptyState
+                                                title="No Users Found"
+                                                subtitle="There are no registered users."
+                                            />
+                                        </td>
+                                    </tr>
 
-                                        <td>
+                                    :
 
-                                            <span
+                                    filteredUsers.map(user => (
 
-                                                style={
+                                        <tr key={user.id}>
+
+                                            <td>{user.name}</td>
+
+                                            <td>{user.email}</td>
+
+                                            <td>
+
+                                                <span
+
+                                                    style={
+
+                                                        user.role === "ADMIN"
+
+                                                            ? styles.admin
+
+                                                            : styles.user
+
+                                                    }
+
+                                                >
+
+                                                    {user.role}
+
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                {
 
                                                     user.role === "ADMIN"
 
-                                                        ? styles.admin
+                                                    ?
 
-                                                        : styles.user
+                                                    <button
+
+                                                        style={styles.disabled}
+
+                                                        disabled
+
+                                                    >
+
+                                                        Protected
+
+                                                    </button>
+
+                                                    :
+
+                                                    <button
+
+                                                        style={styles.deleteButton}
+
+                                                        onClick={() => deleteUser(user.id)}
+
+                                                    >
+
+                                                        Delete
+
+                                                    </button>
 
                                                 }
 
-                                            >
+                                            </td>
 
-                                                {user.role}
+                                        </tr>
 
-                                            </span>
+                                    ))
 
-                                        </td>
+                                }
 
-                                        <td>
+                            </tbody>
 
-                                            {
+                        </table>
 
-                                                user.role === "ADMIN"
-
-                                                ?
-
-                                                <button
-
-                                                    style={styles.disabled}
-
-                                                    disabled
-
-                                                >
-
-                                                    Protected
-
-                                                </button>
-
-                                                :
-
-                                                <button
-
-                                                    style={styles.deleteButton}
-
-                                                    onClick={() => deleteUser(user.id)}
-
-                                                >
-
-                                                    Delete
-
-                                                </button>
-
-                                            }
-
-                                        </td>
-
-                                    </tr>
-
-                                ))
-
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
+                    </div>
+                )}
 
             </div>
 
@@ -274,8 +314,8 @@ const styles = {
         padding: "30px",
 
         maxWidth: "1400px",
-
-        margin: "auto"
+        margin: "auto",
+        boxSizing: "border-box"
 
     },
 
@@ -296,16 +336,12 @@ const styles = {
         maxWidth: "500px",
 
         display: "block",
-
         margin: "0 auto 30px",
-
         padding: "14px",
-
         borderRadius: "8px",
-
         border: "1px solid #ccc",
-
-        fontSize: "16px"
+        fontSize: "16px",
+        boxSizing: "border-box"
 
     },
 
@@ -334,28 +370,22 @@ const styles = {
     admin: {
 
         background: "#16a34a",
-
         color: "white",
-
         padding: "6px 12px",
-
         borderRadius: "20px",
-
-        fontWeight: "bold"
+        fontWeight: "bold",
+        display: "inline-block"
 
     },
 
     user: {
 
         background: "#2563eb",
-
         color: "white",
-
         padding: "6px 12px",
-
         borderRadius: "20px",
-
-        fontWeight: "bold"
+        fontWeight: "bold",
+        display: "inline-block"
 
     },
 
@@ -380,15 +410,51 @@ const styles = {
     disabled: {
 
         background: "#9ca3af",
-
         color: "white",
-
         border: "none",
-
         padding: "10px 18px",
+        borderRadius: "6px",
+        cursor: "not-allowed"
 
-        borderRadius: "6px"
+    },
 
+    cardsList: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px"
+    },
+
+    userCard: {
+        background: "white",
+        border: "1px solid #e5e7eb",
+        borderRadius: "10px",
+        padding: "14px",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
+    },
+
+    cardRow: {
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "10px",
+        marginBottom: "8px",
+        fontSize: "14px"
+    },
+
+    cardLabel: {
+        fontWeight: "700",
+        color: "#374151"
+    },
+
+    cardActions: {
+        display: "flex",
+        marginTop: "10px"
+    },
+
+    emptyState: {
+        background: "white",
+        borderRadius: "10px",
+        border: "1px solid #e5e7eb",
+        padding: "20px"
     }
 
 };
