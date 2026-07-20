@@ -60,7 +60,7 @@ function CustomerStatistics() {
 
             const response = await api.get(
 
-                `/customers/city/${city}`,
+                "/customers/all",
 
                 {
 
@@ -74,7 +74,15 @@ function CustomerStatistics() {
 
             );
 
-            setCustomers(response.data);
+            const normalizedCity = (city || "").trim().toLowerCase();
+
+            const filteredCustomers = (response.data || []).filter((customer) => {
+
+                return (customer.city || "").trim().toLowerCase() === normalizedCity;
+
+            });
+
+            setCustomers(filteredCustomers);
 
             setSelectedCity(city);
 
@@ -244,9 +252,11 @@ ${customer.locationLink}
 
                                         {
 
-                                            customers.map(customer=>(
+                                            customers.length > 0 ? (
 
-                                                <tr key={customer.id}>
+                                                customers.map(customer=>(
+
+                                                    <tr key={customer.id}>
 
                                                     <td style={styles.td}>
                                                         {customer.id}
@@ -353,6 +363,20 @@ ${customer.locationLink}
                                                 </tr>
 
                                             ))
+
+                                            ) : (
+
+                                                <tr>
+
+                                                    <td colSpan="9" style={{ padding: "20px", textAlign: "center", color: "#666" }}>
+
+                                                        No customers found for this city.
+
+                                                    </td>
+
+                                                </tr>
+
+                                            )
 
                                         }
 
