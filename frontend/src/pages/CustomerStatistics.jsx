@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import api from "../api/api";
 import PageWrapper from "../components/PageWrapper";
+import { shareCustomerDetails } from "../utilis/shareCustomer";
 
 function CustomerStatistics() {
 
@@ -12,6 +13,7 @@ function CustomerStatistics() {
 
     const [selectedImages, setSelectedImages] = useState([]);
     const [showImages, setShowImages] = useState(false);
+    const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
 
     useEffect(() => {
 
@@ -130,53 +132,27 @@ function CustomerStatistics() {
 
     }
 
+    function toggleCustomerSelection(customerId){
+        setSelectedCustomerIds((prev) => {
+            if (prev.includes(customerId)) {
+                return prev.filter((id) => id !== customerId);
+            }
+            return [...prev, customerId];
+        });
+    }
+
     async function shareCustomer(customer){
+        await shareCustomerDetails(customer);
+    }
 
-        const text=`
-Customer Details
-
-Name : ${customer.firstName} ${customer.lastName}
-
-Mobile : ${customer.mobile}
-
-City : ${customer.city}
-
-Site Stage : ${customer.siteStage}
-
-Google Map :
-${customer.locationLink}
-`;
-
-        if(navigator.share){
-
-            try{
-
-                await navigator.share({
-
-                    title:"Customer Details",
-
-                    text:text
-
-                });
-
-            }
-
-            catch(error){
-
-                console.log(error);
-
-            }
-
+    async function shareSelectedCustomers(){
+        if (selectedCustomerIds.length === 0) {
+            alert("Select at least one customer to share.");
+            return;
         }
 
-        else{
-
-            navigator.clipboard.writeText(text);
-
-            alert("Customer details copied to clipboard.");
-
-        }
-
+        const selectedCustomers = customers.filter((customer) => selectedCustomerIds.includes(customer.id));
+        await shareCustomerDetails(selectedCustomers);
     }
     return (
 
@@ -226,17 +202,28 @@ ${customer.locationLink}
 
                             <>
 
-                                <h2 style={{marginTop:"40px"}}>
-
-                                    Customers From {selectedCity}
-
-                                </h2>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "40px", gap: "10px", flexWrap: "wrap" }}>
+                                    <h2 style={{ margin: 0 }}>
+                                        Customers From {selectedCity}
+                                    </h2>
+                                    <button style={styles.shareSelectionButton} onClick={shareSelectedCustomers}>
+                                        Share Selected
+                                    </button>
+                                </div>
 
                                 {isMobile ? (
                                     <div style={styles.cardsList}>
                                         {customers.length > 0 ? (
                                             customers.map(customer => (
                                                 <div key={customer.id} style={styles.customerCard}>
+                                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                                                        <span style={styles.customerLabel}>Select</span>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedCustomerIds.includes(customer.id)}
+                                                            onChange={() => toggleCustomerSelection(customer.id)}
+                                                        />
+                                                    </div>
                                                     <div style={styles.customerRow}><span style={styles.customerLabel}>Name</span><span>{customer.firstName} {customer.lastName}</span></div>
                                                     <div style={styles.customerRow}><span style={styles.customerLabel}>Mobile</span><span>{customer.mobile}</span></div>
                                                     <div style={styles.customerRow}><span style={styles.customerLabel}>Stage</span><span>{customer.siteStage || "-"}</span></div>
@@ -260,6 +247,8 @@ ${customer.locationLink}
                                             <thead>
 
                                                 <tr>
+
+                                                    <th style={styles.th}>Select</th>
 
                                                     <th style={styles.th}>ID</th>
 
@@ -292,6 +281,14 @@ ${customer.locationLink}
                                                         customers.map(customer=>(
 
                                                             <tr key={customer.id}>
+
+                                                            <td style={styles.td}>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={selectedCustomerIds.includes(customer.id)}
+                                                                    onChange={() => toggleCustomerSelection(customer.id)}
+                                                                />
+                                                            </td>
 
                                                             <td style={styles.td}>
                                                                 {customer.id}

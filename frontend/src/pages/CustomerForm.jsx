@@ -404,9 +404,9 @@ style={styles.input}
 <option value="">Select Customer Type</option>
 
 <option>Owner</option>
-<option>Tenant</option>
-<option>Builder</option>
-<option>Investor</option>
+<option>Architect</option>
+<option>Contractor</option>
+<option>Onsite Supervisor</option>
 <option>Other</option>
 
 </select>

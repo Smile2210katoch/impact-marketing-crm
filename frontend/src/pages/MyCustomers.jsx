@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import api from "../api/api";
 import PageWrapper from "../components/PageWrapper";
+import { shareCustomerDetails } from "../utilis/shareCustomer";
 
 function MyCustomers() {
 
@@ -84,35 +85,7 @@ function MyCustomers() {
     }
 
     async function shareCustomer(customer) {
-
-        const text = `
-Customer Details
-
-Name : ${customer.firstName} ${customer.lastName}
-
-Mobile : ${customer.mobile}
-
-City : ${customer.city}
-
-Site Stage : ${customer.siteStage}
-
-Google Map :
-${customer.locationLink || "-"}
-`;
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: "Customer Details",
-                    text
-                });
-            } catch (error) {
-                console.log(error);
-            }
-        } else {
-            navigator.clipboard.writeText(text);
-            alert("Customer details copied to clipboard.");
-        }
+        await shareCustomerDetails(customer);
     }
 
     async function deleteCustomer(id) {
@@ -677,9 +650,9 @@ ${customer.locationLink || "-"}
                             >
                                 <option value="">Select Customer Type</option>
                                 <option>Owner</option>
-                                <option>Tenant</option>
-                                <option>Builder</option>
-                                <option>Investor</option>
+                                <option>Architect</option>
+                                <option>Contractor</option>
+                                <option>Onsite Supervisor</option>
                                 <option>Other</option>
                             </select>
 

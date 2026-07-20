@@ -18,6 +18,7 @@ function ManageCustomers() {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedImage, setSelectedImage] = useState("");
     const [showImage, setShowImage] = useState(false);
+    const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
 
     const [editForm, setEditForm] = useState({
    
@@ -295,6 +296,27 @@ function ManageCustomers() {
 
     }
 
+    function toggleCustomerSelection(customerId){
+        setSelectedCustomerIds((prev) => {
+            if (prev.includes(customerId)) {
+                return prev.filter((id) => id !== customerId);
+            }
+            return [...prev, customerId];
+        });
+    }
+
+    async function shareSelectedCustomers(){
+        if (selectedCustomerIds.length === 0) {
+            toast.info("Select at least one customer to share.");
+            return;
+        }
+
+        const selectedCustomers = customers.filter((customer) => selectedCustomerIds.includes(customer.id));
+        const shareUrl = `https://wa.me/?text=${encodeURIComponent(selectedCustomers.map((customer) => `${customer.firstName} ${customer.lastName} - ${customer.mobile || "-"}`).join("\n"))}`;
+
+        window.open(shareUrl, "_blank", "noopener,noreferrer");
+    }
+
     async function updateCustomer(){
 
         try{
@@ -405,6 +427,13 @@ return (
                     📄 Export PDF
                 </button>
 
+                <button
+                    style={styles.shareSelectionButton}
+                    onClick={shareSelectedCustomers}
+                >
+                    📤 Share Selected
+                </button>
+
             </div>
 
             <input
@@ -429,6 +458,14 @@ return (
                     ) : (
                         currentCustomers.map(customer => (
                             <div key={customer.id} style={styles.cardItem}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                                    <span style={styles.cardLabel}>Select</span>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedCustomerIds.includes(customer.id)}
+                                        onChange={() => toggleCustomerSelection(customer.id)}
+                                    />
+                                </div>
                                 <div style={styles.cardRow}><span style={styles.cardLabel}>Name</span><span>{customer.firstName} {customer.lastName}</span></div>
                                 <div style={styles.cardRow}><span style={styles.cardLabel}>Mobile</span><span>{customer.mobile}</span></div>
                                 <div style={styles.cardRow}><span style={styles.cardLabel}>City</span><span>{customer.city}</span></div>
@@ -452,6 +489,8 @@ return (
                 <thead>
 
                     <tr>
+
+                        <th>Select</th>
 
                         <th>ID</th>
 
@@ -501,6 +540,14 @@ return (
                         customers.map(customer=>(
 
                             <tr key={customer.id}>
+
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedCustomerIds.includes(customer.id)}
+                                        onChange={() => toggleCustomerSelection(customer.id)}
+                                    />
+                                </td>
 
                                 <td>{customer.id}</td>
 
@@ -915,9 +962,9 @@ Close
                             >
                                 <option value="">Select Customer Type</option>
                                 <option>Owner</option>
-                                <option>Tenant</option>
-                                <option>Builder</option>
-                                <option>Investor</option>
+                                <option>Architect</option>
+                                <option>Contractor</option>
+                                <option>Onsite Supervisor</option>
                                 <option>Other</option>
                             </select>
 
@@ -1052,6 +1099,15 @@ const styles = {
 
         marginBottom:"20px"
 
+    },
+
+    shareSelectionButton:{
+        background: "#0f766e",
+        color: "white",
+        border: "none",
+        padding: "10px 16px",
+        borderRadius: "6px",
+        cursor: "pointer"
     },
 
     excelButton:{
