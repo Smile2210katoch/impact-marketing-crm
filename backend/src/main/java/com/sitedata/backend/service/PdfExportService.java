@@ -1,14 +1,21 @@
 package com.sitedata.backend.service;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
-import com.sitedata.backend.entity.CustomerDetails;
-import com.sitedata.backend.repository.CustomerDetailsRepository;
-import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import com.sitedata.backend.entity.CustomerDetails;
+import com.sitedata.backend.repository.CustomerDetailsRepository;
 
 @Service
 public class PdfExportService {
@@ -41,15 +48,17 @@ public class PdfExportService {
             document.add(title);
             document.add(new Paragraph(" "));
 
-            PdfPTable table = new PdfPTable(14);
+            PdfPTable table = new PdfPTable(16);
 
             table.setWidthPercentage(100);
 
             table.setWidths(new float[]{
                     1f,
+                    1.2f,
                     2f,
                     2f,
                     2f,
+                    1.8f,
                     2f,
                     2f,
                     2f,
@@ -63,9 +72,11 @@ public class PdfExportService {
             });
 
             table.addCell("ID");
+            table.addCell("Salutation");
             table.addCell("First Name");
             table.addCell("Last Name");
             table.addCell("Mobile");
+            table.addCell("Customer Type");
             table.addCell("City");
             table.addCell("Architect");
             table.addCell("Stage");
@@ -82,9 +93,11 @@ public class PdfExportService {
             for (CustomerDetails c : customers) {
 
                 table.addCell(String.valueOf(c.getId()));
+                table.addCell(c.getSalutation() == null ? "" : c.getSalutation());
                 table.addCell(c.getFirstName());
                 table.addCell(c.getLastName());
                 table.addCell(c.getMobile());
+                table.addCell(c.getCustomerType() == null ? "" : c.getCustomerType());
                 table.addCell(c.getCity());
                 table.addCell(c.getArchitectName() == null ? "" : c.getArchitectName());
                 table.addCell(c.getSiteStage() == null ? "" : c.getSiteStage());

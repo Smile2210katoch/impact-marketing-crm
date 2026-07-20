@@ -21,6 +21,7 @@ function ManageCustomers() {
     const [editForm, setEditForm] = useState({
    
 
+        salutation:"",
         firstName:"",
         lastName:"",
         mobile:"",
@@ -33,6 +34,7 @@ function ManageCustomers() {
         siteStage:"",
         enquiryType:"",
         source:"",
+        customerType:"",
         locationLink:"",
         image1:"",
         image2:"",
@@ -244,6 +246,7 @@ function ManageCustomers() {
 
         setEditForm({
 
+            salutation:customer.salutation||"",
             firstName:customer.firstName||"",
             lastName:customer.lastName||"",
             mobile:customer.mobile||"",
@@ -256,6 +259,7 @@ function ManageCustomers() {
             siteStage:customer.siteStage||"",
             enquiryType:customer.enquiryType||"",
             source:customer.source||"",
+            customerType:customer.customerType||"",
             locationLink:customer.locationLink||"",
             image1:customer.image1||"",
             image2:customer.image2||"",
@@ -654,13 +658,15 @@ Next
 
 <h2>Customer Details</h2>
 
-<p><b>Name :</b> {selectedCustomer.firstName} {selectedCustomer.lastName}</p>
+<p><b>Name :</b> {selectedCustomer.salutation ? `${selectedCustomer.salutation} ` : ""}{selectedCustomer.firstName} {selectedCustomer.lastName}</p>
+
+<p><b>Customer Type :</b> {selectedCustomer.customerType || "-"}</p>
 
 <p><b>Mobile :</b> {selectedCustomer.mobile}</p>
 
 <p><b>House No :</b> {selectedCustomer.houseNo}</p>
 
-<p><b>Street :</b> {selectedCustomer.street}</p>
+<p><b>Street / Phase / Sector :</b> {selectedCustomer.street || "-"}</p>
 
 <p><b>City :</b> {selectedCustomer.city}</p>
 
@@ -780,6 +786,18 @@ Close
 
                             <h2>Edit Customer</h2>
 
+                            <select
+                                name="salutation"
+                                value={editForm.salutation}
+                                onChange={handleEditChange}
+                                style={styles.input}
+                            >
+                                <option value="">Select Salutation</option>
+                                <option>Mr</option>
+                                <option>Mrs</option>
+                                <option>Miss</option>
+                            </select>
+
                             <input
                                 name="firstName"
                                 value={editForm.firstName}
@@ -801,6 +819,22 @@ Close
                                 value={editForm.mobile}
                                 onChange={handleEditChange}
                                 placeholder="Mobile"
+                                style={styles.input}
+                            />
+
+                            <input
+                                name="houseNo"
+                                value={editForm.houseNo}
+                                onChange={handleEditChange}
+                                placeholder="House No"
+                                style={styles.input}
+                            />
+
+                            <input
+                                name="street"
+                                value={editForm.street}
+                                onChange={handleEditChange}
+                                placeholder="Street / Phase / Sector"
                                 style={styles.input}
                             />
 
@@ -827,6 +861,20 @@ Close
                                 placeholder="Source"
                                 style={styles.input}
                             />
+                            <select
+                                name="customerType"
+                                value={editForm.customerType}
+                                onChange={handleEditChange}
+                                style={styles.input}
+                            >
+                                <option value="">Select Customer Type</option>
+                                <option>Owner</option>
+                                <option>Tenant</option>
+                                <option>Builder</option>
+                                <option>Investor</option>
+                                <option>Other</option>
+                            </select>
+
                             <input
 name="locationLink"
 value={editForm.locationLink}

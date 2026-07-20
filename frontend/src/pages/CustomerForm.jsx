@@ -8,6 +8,7 @@ function CustomerForm() {
 
     const [form, setForm] = useState({
 
+        salutation: "",
         firstName: "",
         lastName: "",
         mobile: "",
@@ -20,6 +21,7 @@ function CustomerForm() {
         siteStage: "",
         enquiryType: "",
         source: "",
+        customerType: "",
         locationLink: "",
         image1: "",
         image2: "",
@@ -33,11 +35,44 @@ function CustomerForm() {
 const [loading, setLoading] = useState(false);
 const [images, setImages] = useState([]);
 
+function buildGoogleMapsLink(details) {
+    const parts = [details.houseNo, details.street, details.city, details.state]
+        .filter(Boolean)
+        .map((value) => value.trim());
+
+    if (parts.length === 0) {
+        return "";
+    }
+
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(" "))}`;
+}
+
 function handleChange(e) {
-    setForm({
+    const { name, value } = e.target;
+    const updatedForm = {
         ...form,
-        [e.target.name]: e.target.value
-    });
+        [name]: value
+    };
+
+    setForm(updatedForm);
+
+    const addressFields = ["houseNo", "street", "city", "state"];
+    if (addressFields.includes(name) && !updatedForm.locationLink) {
+        const generatedLink = buildGoogleMapsLink(updatedForm);
+        if (generatedLink) {
+            setForm({ ...updatedForm, locationLink: generatedLink });
+        }
+    }
+}
+
+function handleGenerateLocationLink() {
+    const generatedLink = buildGoogleMapsLink(form);
+    if (generatedLink) {
+        setForm({ ...form, locationLink: generatedLink });
+        toast.success("Google Maps link generated");
+    } else {
+        toast.error("Add house number, street, city or state first");
+    }
 }
 
 function handleImageChange(e) {
@@ -146,6 +181,7 @@ async function handleSubmit(e) {
         toast.success("Customer Added Successfully");
 
         setForm({
+            salutation: "",
             firstName: "",
             lastName: "",
             mobile: "",
@@ -158,6 +194,7 @@ async function handleSubmit(e) {
             siteStage: "",
             enquiryType: "",
             source: "",
+            customerType: "",
             locationLink: "",
             image1: "",
             image2: "",
@@ -213,6 +250,18 @@ async function handleSubmit(e) {
 
                     <div style={styles.grid}>
 
+                        <select
+                            name="salutation"
+                            value={form.salutation}
+                            onChange={handleChange}
+                            style={styles.input}
+                        >
+                            <option value="">Select Salutation</option>
+                            <option>Mr</option>
+                            <option>Mrs</option>
+                            <option>Miss</option>
+                        </select>
+
                         <input
                             name="firstName"
                             placeholder="First Name"
@@ -250,7 +299,7 @@ async function handleSubmit(e) {
 
                         <input
                             name="street"
-                            placeholder="Street"
+                            placeholder="Street / Phase / Sector"
                             value={form.street}
                             onChange={handleChange}
                             style={styles.input}
@@ -346,6 +395,23 @@ style={styles.input}
 </select>
 
                         <select
+name="customerType"
+value={form.customerType}
+onChange={handleChange}
+style={styles.input}
+>
+
+<option value="">Select Customer Type</option>
+
+<option>Owner</option>
+<option>Tenant</option>
+<option>Builder</option>
+<option>Investor</option>
+<option>Other</option>
+
+</select>
+
+                        <select
 name="source"
 value={form.source}
 onChange={handleChange}
@@ -371,14 +437,23 @@ style={styles.input}
 <option>Other</option>
 
 </select>
-<input
-    name="locationLink"
-    type="url"
-    placeholder="Google Maps Location Link"
-    value={form.locationLink}
-    onChange={handleChange}
-    style={styles.input}
-/>
+<div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+    <input
+        name="locationLink"
+        type="url"
+        placeholder="Paste or generate Google Maps link"
+        value={form.locationLink}
+        onChange={handleChange}
+        style={styles.input}
+    />
+    <button
+        type="button"
+        onClick={handleGenerateLocationLink}
+        style={{ ...styles.input, cursor: "pointer", background: "#eff6ff", color: "#1d4ed8", fontWeight: "600" }}
+    >
+        Generate Google Maps Link
+    </button>
+</div>
 <div>
 
 <label style={{fontWeight:"bold"}}>

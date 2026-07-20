@@ -7,11 +7,13 @@ function MyCustomers() {
 
     const [customers, setCustomers] = useState([]);
     const [search, setSearch] = useState("");
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
 
     const [editingCustomer, setEditingCustomer] = useState(null);
 
     const [editForm, setEditForm] = useState({
 
+    salutation: "",
     firstName: "",
     lastName: "",
     mobile: "",
@@ -24,7 +26,7 @@ function MyCustomers() {
     siteStage: "",
     enquiryType: "",
     source: "",
-
+        customerType: "",
     locationLink: "",
 
     image1: "",
@@ -39,6 +41,17 @@ function MyCustomers() {
 
         fetchCustomers();
 
+    }, []);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(max-width: 768px)");
+
+        const handleResize = () => setIsMobile(mediaQuery.matches);
+
+        handleResize();
+        mediaQuery.addEventListener("change", handleResize);
+
+        return () => mediaQuery.removeEventListener("change", handleResize);
     }, []);
 
     async function fetchCustomers() {
@@ -68,6 +81,38 @@ function MyCustomers() {
 
         }
 
+    }
+
+    async function shareCustomer(customer) {
+
+        const text = `
+Customer Details
+
+Name : ${customer.firstName} ${customer.lastName}
+
+Mobile : ${customer.mobile}
+
+City : ${customer.city}
+
+Site Stage : ${customer.siteStage}
+
+Google Map :
+${customer.locationLink || "-"}
+`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: "Customer Details",
+                    text
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        } else {
+            navigator.clipboard.writeText(text);
+            alert("Customer details copied to clipboard.");
+        }
     }
 
     async function deleteCustomer(id) {
@@ -117,6 +162,7 @@ function MyCustomers() {
 
         setEditForm({
 
+            salutation: customer.salutation || "",
             firstName: customer.firstName || "",
             lastName: customer.lastName || "",
             mobile: customer.mobile || "",
@@ -129,6 +175,7 @@ function MyCustomers() {
             siteStage: customer.siteStage || "",
             enquiryType: customer.enquiryType || "",
             source: customer.source || "",
+            customerType: customer.customerType || "",
             locationLink: customer.locationLink || "",
             image1: customer.image1 || "",
             image2: customer.image2 || "",
@@ -221,7 +268,7 @@ function MyCustomers() {
 
             <div style={styles.container}>
 
-                <h1 style={styles.heading}>
+                <h1 style={{ ...styles.heading, fontSize: isMobile ? "24px" : "32px" }}>
 
                     My Customers
 
@@ -229,7 +276,7 @@ function MyCustomers() {
 
                 <input
 
-                    style={styles.search}
+                    style={{ ...styles.search, width: isMobile ? "100%" : "350px" }}
 
                     placeholder="Search by Name / Mobile / City"
 
@@ -239,54 +286,120 @@ function MyCustomers() {
 
                 />
 
-                <table style={styles.table}>
+                {isMobile ? (
+                    <div style={styles.cardsList}>
+                        {filteredCustomers.length > 0 ? (
+                            filteredCustomers.map(customer => (
+                                <div key={customer.id} style={styles.card}>
+                                    <div style={styles.cardRow}>
+                                        <span style={styles.cardLabel}>Name</span>
+                                        <span>{customer.firstName} {customer.lastName}</span>
+                                    </div>
+                                    <div style={styles.cardRow}>
+                                        <span style={styles.cardLabel}>Mobile</span>
+                                        <span>{customer.mobile}</span>
+                                    </div>
+                                    <div style={styles.cardRow}>
+                                        <span style={styles.cardLabel}>City</span>
+                                        <span>{customer.city}</span>
+                                    </div>
+                                    <div style={styles.cardRow}>
+                                        <span style={styles.cardLabel}>Stage</span>
+                                        <span>{customer.siteStage || "-"}</span>
+                                    </div>
+                                    <div style={styles.cardRow}>
+                                        <span style={styles.cardLabel}>Source</span>
+                                        <span>{customer.source || "-"}</span>
+                                    </div>
+                                    <div style={styles.cardRow}>
+                                        <span style={styles.cardLabel}>Location</span>
+                                        <span>
+                                            {customer.locationLink ? (
+                                                <a href={customer.locationLink} target="_blank" rel="noreferrer">📍 Open</a>
+                                            ) : "-"}
+                                        </span>
+                                    </div>
+                                    <div style={styles.cardRow}>
+                                        <span style={styles.cardLabel}>Images</span>
+                                        <div style={styles.imageRow}>
+                                            {[
+                                                customer.image1,
+                                                customer.image2,
+                                                customer.image3,
+                                                customer.image4,
+                                                customer.image5
+                                            ].filter(Boolean).map((img, index) => (
+                                                <img key={index} src={img} alt="" style={styles.thumbnail} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div style={styles.cardActions}>
+                                        <button style={{ ...styles.editButton, ...styles.mobileActionButton }} onClick={() => openEdit(customer)}>
+                                            Edit
+                                        </button>
+                                        <button style={{ ...styles.shareButton, ...styles.mobileActionButton }} onClick={() => shareCustomer(customer)}>
+                                            Share
+                                        </button>
+                                        <button style={{ ...styles.deleteButton, ...styles.mobileActionButton }} onClick={() => deleteCustomer(customer.id)}>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div style={styles.emptyState}>No customers found</div>
+                        )}
+                    </div>
+                ) : (
+                    <div style={styles.tableWrapper}>
+                        <table style={styles.table}>
 
-                    <thead>
+                            <thead>
 
-                        <tr>
+                                <tr>
 
-                            <th>First Name</th>
+                                    <th>First Name</th>
 
-                            <th>Last Name</th>
+                                    <th>Last Name</th>
 
-                            <th>Mobile</th>
+                                    <th>Mobile</th>
 
-                            <th>City</th>
+                                    <th>City</th>
 
-                            <th>Site Stage</th>
+                                    <th>Site Stage</th>
 
-                            <th>Source</th>
-                            <th>Location</th>
-                            <th>Images</th>
-                            <th>Edit</th>
+                                    <th>Source</th>
+                                    <th>Location</th>
+                                    <th>Images</th>
+                                    <th>Edit</th>
 
-                            <th>Delete</th>
+                                    <th>Delete</th>
 
-                        </tr>
+                                </tr>
 
-                    </thead>
+                            </thead>
 
-                    <tbody>
+                            <tbody>
 
-                        {
+                                {
 
-                            filteredCustomers.length > 0 ? (
+                                    filteredCustomers.length > 0 ? (
 
-                                filteredCustomers.map(customer => (
+                                        filteredCustomers.map(customer => (
 
-                                    <tr key={customer.id}>
+                                            <tr key={customer.id}>
 
-                                        <td>{customer.firstName}</td>
+                                                <td>{customer.firstName}</td>
 
-                                        <td>{customer.lastName}</td>
+                                                <td>{customer.lastName}</td>
 
-                                        <td>{customer.mobile}</td>
+                                                <td>{customer.mobile}</td>
 
-                                        <td>{customer.city}</td>
+                                                <td>{customer.city}</td>
 
-                                        <td>{customer.siteStage}</td>
+                                                <td>{customer.siteStage}</td>
 
-                                        <td>{customer.source}</td>
+                                                <td>{customer.source}</td>
 
 <td>
 
@@ -363,6 +476,17 @@ function MyCustomers() {
                                         <td>
 
                                             <button
+                                                style={styles.shareButton}
+                                                onClick={() => shareCustomer(customer)}
+                                            >
+                                                Share
+                                            </button>
+
+                                        </td>
+
+                                        <td>
+
+                                            <button
                                                 style={styles.deleteButton}
                                                 onClick={() => deleteCustomer(customer.id)}
                                             >
@@ -399,6 +523,8 @@ function MyCustomers() {
                     </tbody>
 
                 </table>
+                    </div>
+                )}
 
                 {
 
@@ -413,6 +539,18 @@ function MyCustomers() {
                                 Edit Customer
 
                             </h2>
+
+                            <select
+                                name="salutation"
+                                value={editForm.salutation}
+                                onChange={handleEditChange}
+                                style={styles.input}
+                            >
+                                <option value="">Select Salutation</option>
+                                <option>Mr</option>
+                                <option>Mrs</option>
+                                <option>Miss</option>
+                            </select>
 
                             <input
 
@@ -509,12 +647,48 @@ function MyCustomers() {
                                 placeholder="Enquiry Type"
                             />
 
+                            <input                                name="houseNo"
+                                value={editForm.houseNo}
+                                onChange={handleEditChange}
+                                style={styles.input}
+                                placeholder="House No"
+                            />
+
                             <input
-                                name="source"
+                                name="street"
+                                value={editForm.street}
+                                onChange={handleEditChange}
+                                style={styles.input}
+                                placeholder="Street / Phase / Sector"
+                            />
+
+                            <input                                name="source"
                                 value={editForm.source}
                                 onChange={handleEditChange}
                                 style={styles.input}
                                 placeholder="Source"
+                            />
+
+                            <select
+                                name="customerType"
+                                value={editForm.customerType}
+                                onChange={handleEditChange}
+                                style={styles.input}
+                            >
+                                <option value="">Select Customer Type</option>
+                                <option>Owner</option>
+                                <option>Tenant</option>
+                                <option>Builder</option>
+                                <option>Investor</option>
+                                <option>Other</option>
+                            </select>
+
+                            <input
+                                name="locationLink"
+                                value={editForm.locationLink}
+                                onChange={handleEditChange}
+                                style={styles.input}
+                                placeholder="Google Maps Link"
                             />
 
                             <div style={styles.buttonContainer}>
@@ -561,24 +735,34 @@ const styles = {
 
     heading: {
 
-        marginBottom: "20px"
+        marginBottom: "20px",
+        color: "#111827"
 
     },
 
     search: {
 
-        width: "350px",
+        maxWidth: "420px",
         padding: "10px",
         marginBottom: "20px",
         borderRadius: "6px",
-        border: "1px solid #ccc"
+        border: "1px solid #ccc",
+        boxSizing: "border-box"
 
+    },
+
+    tableWrapper: {
+        overflowX: "auto",
+        borderRadius: "10px",
+        border: "1px solid #e5e7eb"
     },
 
     table: {
 
         width: "100%",
-        borderCollapse: "collapse"
+        borderCollapse: "collapse",
+        minWidth: "900px",
+        background: "white"
 
     },
 
@@ -596,6 +780,17 @@ const styles = {
     editButton: {
 
         background: "#2563eb",
+        color: "white",
+        border: "none",
+        padding: "8px 12px",
+        borderRadius: "5px",
+        cursor: "pointer"
+
+    },
+
+    shareButton: {
+
+        background: "#16a34a",
         color: "white",
         border: "none",
         padding: "8px 12px",
@@ -625,7 +820,9 @@ const styles = {
         background: "rgba(0,0,0,0.5)",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        padding: "15px",
+        boxSizing: "border-box"
 
     },
 
@@ -634,7 +831,8 @@ const styles = {
         background: "white",
         padding: "25px",
         borderRadius: "10px",
-        width: "500px",
+        width: "100%",
+        maxWidth: "500px",
         maxHeight: "90vh",
         overflowY: "auto"
 
@@ -644,7 +842,9 @@ const styles = {
 
         display: "flex",
         justifyContent: "space-between",
-        marginTop: "15px"
+        gap: "10px",
+        marginTop: "15px",
+        flexWrap: "wrap"
 
     },
 
@@ -670,11 +870,68 @@ const styles = {
 
     }
     ,
-    table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    tableLayout: "fixed"
-},
+    cardsList: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px"
+    },
+
+    card: {
+        background: "white",
+        border: "1px solid #e5e7eb",
+        borderRadius: "10px",
+        padding: "14px",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
+    },
+
+    cardRow: {
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "10px",
+        marginBottom: "8px",
+        fontSize: "14px"
+    },
+
+    cardLabel: {
+        fontWeight: "700",
+        color: "#374151"
+    },
+
+    imageRow: {
+        display: "flex",
+        gap: "6px",
+        flexWrap: "wrap",
+        justifyContent: "flex-end"
+    },
+
+    thumbnail: {
+        width: "44px",
+        height: "44px",
+        objectFit: "cover",
+        borderRadius: "6px"
+    },
+
+    cardActions: {
+        display: "flex",
+        gap: "8px",
+        marginTop: "10px"
+    },
+
+    mobileActionButton: {
+        flex: 1,
+        padding: "8px 10px"
+    },
+
+    emptyState: {
+        textAlign: "center",
+        padding: "30px",
+        fontSize: "18px",
+        color: "#666",
+        fontWeight: "600",
+        background: "white",
+        borderRadius: "10px",
+        border: "1px solid #e5e7eb"
+    }
 
 };
 

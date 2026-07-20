@@ -20,6 +20,10 @@ public class CustomerDetails {
 
     private String lastName;
 
+    private String salutation;
+
+    private String customerType;
+
     private String mobile;
 
     private String houseNo;
@@ -79,6 +83,22 @@ public class CustomerDetails {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getSalutation() {
+        return salutation;
+    }
+
+    public void setSalutation(String salutation) {
+        this.salutation = salutation;
+    }
+
+    public String getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(String customerType) {
+        this.customerType = customerType;
     }
 
     public String getMobile() {

@@ -18,6 +18,6 @@ public interface CustomerDetailsRepository extends JpaRepository<CustomerDetails
     List<CustomerDetails> findTop5ByOrderByIdDesc();
 
     // Customers By City
-    List<CustomerDetails> findByCity(String city);
+    List<CustomerDetails> findByCityIgnoreCase(String city);
 
 }

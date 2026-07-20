@@ -34,6 +34,9 @@ public class CustomerDetailsService {
 
         details.setUser(user);
 
+        details.setSalutation(details.getSalutation());
+        details.setCustomerType(details.getCustomerType());
+
         // Location
         details.setLocationLink(details.getLocationLink());
 
@@ -74,6 +77,8 @@ public class CustomerDetailsService {
 
         existing.setFirstName(updatedDetails.getFirstName());
         existing.setLastName(updatedDetails.getLastName());
+        existing.setSalutation(updatedDetails.getSalutation());
+        existing.setCustomerType(updatedDetails.getCustomerType());
         existing.setMobile(updatedDetails.getMobile());
         existing.setHouseNo(updatedDetails.getHouseNo());
         existing.setStreet(updatedDetails.getStreet());
@@ -126,7 +131,9 @@ public class CustomerDetailsService {
     // Customers By City
     public List<CustomerDetails> getCustomersByCity(String city) {
 
-        return customerRepository.findByCity(city);
+        String normalizedCity = city == null ? "" : city.trim();
+
+        return customerRepository.findByCityIgnoreCase(normalizedCity);
 
     }
 
