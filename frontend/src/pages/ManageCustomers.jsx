@@ -10,6 +10,7 @@ function ManageCustomers() {
     const [customers, setCustomers] = useState([]);
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
 
     const customersPerPage = 5;
 
@@ -49,6 +50,17 @@ function ManageCustomers() {
         loadCustomers();
 
     },[]);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(max-width: 768px)");
+
+        const handleResize = () => setIsMobile(mediaQuery.matches);
+
+        handleResize();
+        mediaQuery.addEventListener("change", handleResize);
+
+        return () => mediaQuery.removeEventListener("change", handleResize);
+    }, []);
 
     async function loadCustomers(){
 
@@ -367,7 +379,7 @@ return (
 
         <div style={styles.container}>
 
-            <h1>Manage Customers</h1>
+            <h1 style={{ fontSize: isMobile ? "24px" : "32px" }}>Manage Customers</h1>
 
             <div style={styles.card}>
 
@@ -377,7 +389,7 @@ return (
 
             </div>
 
-            <div style={styles.buttonContainer}>
+            <div style={{ ...styles.buttonContainer, flexDirection: isMobile ? "column" : "row" }}>
 
                 <button
                     style={styles.excelButton}
@@ -400,9 +412,41 @@ return (
                 placeholder="Search Name, Mobile, City..."
                 value={search}
                 onChange={(e)=>setSearch(e.target.value)}
-                style={styles.search}
+                style={{ ...styles.search, width: isMobile ? "100%" : "350px" }}
             />
 
+            {isMobile ? (
+                <div style={styles.cardsList}>
+                    {customers.length === 0 ? (
+                        <div style={styles.emptyState}>
+                            <EmptyState
+                                title="No Customers Found"
+                                subtitle="Start by adding your first customer."
+                                buttonText="Add Customer"
+                                buttonLink="/customer"
+                            />
+                        </div>
+                    ) : (
+                        currentCustomers.map(customer => (
+                            <div key={customer.id} style={styles.cardItem}>
+                                <div style={styles.cardRow}><span style={styles.cardLabel}>Name</span><span>{customer.firstName} {customer.lastName}</span></div>
+                                <div style={styles.cardRow}><span style={styles.cardLabel}>Mobile</span><span>{customer.mobile}</span></div>
+                                <div style={styles.cardRow}><span style={styles.cardLabel}>City</span><span>{customer.city}</span></div>
+                                <div style={styles.cardRow}><span style={styles.cardLabel}>Stage</span><span>{customer.siteStage || "-"}</span></div>
+                                <div style={styles.cardRow}><span style={styles.cardLabel}>Source</span><span>{customer.source || "-"}</span></div>
+                                <div style={styles.cardRow}><span style={styles.cardLabel}>Location</span><span>{customer.locationLink ? <a href={customer.locationLink} target="_blank" rel="noreferrer">📍 Open</a> : "-"}</span></div>
+                                <div style={styles.cardRow}><span style={styles.cardLabel}>Images</span><div style={styles.imageRow}>{[customer.image1, customer.image2, customer.image3, customer.image4, customer.image5].filter(Boolean).map((img, index) => <img key={index} src={img} alt="" style={styles.thumbnail} onClick={() => { setSelectedImage(img); setShowImage(true); }} />)}</div></div>
+                                <div style={styles.cardActions}>
+                                    <button style={{ ...styles.viewButton, ...styles.mobileButton }} onClick={() => setSelectedCustomer(customer)}>View</button>
+                                    <button style={{ ...styles.editButton, ...styles.mobileButton }} onClick={() => openEdit(customer)}>Edit</button>
+                                    <button style={{ ...styles.deleteButton, ...styles.mobileButton }} onClick={() => deleteCustomer(customer.id)}>Delete</button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            ) : (
+            <div style={styles.tableWrapper}>
             <table style={styles.table}>
 
                 <thead>
@@ -613,6 +657,8 @@ setShowImage(true);
                 </tbody>
 
             </table>
+            </div>
+            )}
             <div style={styles.pagination}>
 
 <button
@@ -1042,16 +1088,22 @@ const styles = {
 
     search:{
 
-        width:"350px",
+        maxWidth:"420px",
 
         padding:"10px",
 
         marginBottom:"20px",
-
+        boxSizing:"border-box",
         borderRadius:"8px",
 
         border:"1px solid gray"
 
+    },
+
+    tableWrapper:{
+        overflowX:"auto",
+        borderRadius:"10px",
+        border:"1px solid #ddd"
     },
 
     table:{
@@ -1059,8 +1111,9 @@ const styles = {
         width:"100%",
 
         borderCollapse:"collapse",
-
-        border:"1px solid #ddd"
+        border:"1px solid #ddd",
+        minWidth:"900px",
+        background:"white"
 
     },
 
@@ -1170,7 +1223,9 @@ alignItems:"center",
 
 gap:"20px",
 
-marginTop:"25px"
+marginTop:"25px",
+
+flexWrap:"wrap"
 
 },
 
@@ -1217,13 +1272,73 @@ cursor:"pointer"
         background:"white",
 
         padding:"30px",
-
-        width:"450px",
-
+        width:"100%",
+        maxWidth:"450px",
         borderRadius:"10px",
+        boxShadow:"0 0 20px rgba(0,0,0,0.3)",
+        maxHeight:"90vh",
+        overflowY:"auto"
 
-        boxShadow:"0 0 20px rgba(0,0,0,0.3)"
+    },
 
+    cardsList:{
+        display:"flex",
+        flexDirection:"column",
+        gap:"12px"
+    },
+
+    cardItem:{
+        background:"white",
+        border:"1px solid #e5e7eb",
+        borderRadius:"10px",
+        padding:"14px",
+        boxShadow:"0 2px 6px rgba(0,0,0,0.05)"
+    },
+
+    cardRow:{
+        display:"flex",
+        justifyContent:"space-between",
+        gap:"10px",
+        marginBottom:"8px",
+        fontSize:"14px"
+    },
+
+    cardLabel:{
+        fontWeight:"700",
+        color:"#374151"
+    },
+
+    imageRow:{
+        display:"flex",
+        gap:"6px",
+        flexWrap:"wrap",
+        justifyContent:"flex-end"
+    },
+
+    thumbnail:{
+        width:"44px",
+        height:"44px",
+        objectFit:"cover",
+        borderRadius:"6px"
+    },
+
+    cardActions:{
+        display:"flex",
+        gap:"8px",
+        marginTop:"10px",
+        flexWrap:"wrap"
+    },
+
+    mobileButton:{
+        flex:1,
+        minWidth:"70px"
+    },
+
+    emptyState:{
+        background:"white",
+        borderRadius:"10px",
+        border:"1px solid #e5e7eb",
+        padding:"20px"
     }
 
 };

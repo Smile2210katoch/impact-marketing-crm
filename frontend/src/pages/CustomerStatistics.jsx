@@ -8,6 +8,7 @@ function CustomerStatistics() {
     const [stats, setStats] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [selectedCity, setSelectedCity] = useState("");
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
 
     const [selectedImages, setSelectedImages] = useState([]);
     const [showImages, setShowImages] = useState(false);
@@ -16,6 +17,17 @@ function CustomerStatistics() {
 
         loadStats();
 
+    }, []);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(max-width: 768px)");
+
+        const handleResize = () => setIsMobile(mediaQuery.matches);
+
+        handleResize();
+        mediaQuery.addEventListener("change", handleResize);
+
+        return () => mediaQuery.removeEventListener("change", handleResize);
     }, []);
 
     async function loadStats() {
@@ -176,7 +188,7 @@ ${customer.locationLink}
 
                 <div style={styles.container}>
 
-                    <h1>Customer Statistics</h1>
+                    <h1 style={{ fontSize: isMobile ? "24px" : "32px" }}>Customer Statistics</h1>
 
                     <div style={styles.cards}>
 
@@ -220,169 +232,194 @@ ${customer.locationLink}
 
                                 </h2>
 
-                                <table style={styles.table}>
-
-                                    <thead>
-
-                                        <tr>
-
-                                            <th style={styles.th}>ID</th>
-
-                                            <th style={styles.th}>Image</th>
-
-                                            <th style={styles.th}>Name</th>
-
-                                            <th style={styles.th}>Mobile</th>
-
-                                            <th style={styles.th}>Stage</th>
-
-                                            <th style={styles.th}>Source</th>
-
-                                            <th style={styles.th}>Location</th>
-
-                                            <th style={styles.th}>Images</th>
-
-                                            <th style={styles.th}>Share</th>
-
-                                        </tr>
-
-                                    </thead>
-
-                                    <tbody>
-
-                                        {
-
-                                            customers.length > 0 ? (
-
-                                                customers.map(customer=>(
-
-                                                    <tr key={customer.id}>
-
-                                                    <td style={styles.td}>
-                                                        {customer.id}
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        {
-
-                                                            customer.image1 ?
-
-                                                            <img
-
-                                                                src={customer.image1}
-
-                                                                alt=""
-
-                                                                style={styles.thumbnail}
-
-                                                            />
-
-                                                            :
-
-                                                            "No Image"
-
-                                                        }
-
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        {customer.firstName} {customer.lastName}
-
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        {customer.mobile}
-
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        {customer.siteStage}
-
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        {customer.source}
-
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        <a
-
-                                                            href={customer.locationLink}
-
-                                                            target="_blank"
-
-                                                            rel="noreferrer"
-
-                                                        >
-
-                                                            Open Map
-
-                                                        </a>
-
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        <button
-
-                                                            style={styles.viewButton}
-
-                                                            onClick={()=>viewImages(customer)}
-
-                                                        >
-
-                                                            View Images
-
-                                                        </button>
-
-                                                    </td>
-
-                                                    <td style={styles.td}>
-
-                                                        <button
-
-                                                            style={styles.shareButton}
-
-                                                            onClick={()=>shareCustomer(customer)}
-
-                                                        >
-
-                                                            Share
-
-                                                        </button>
-
-                                                    </td>
-
-                                                </tr>
-
+                                {isMobile ? (
+                                    <div style={styles.cardsList}>
+                                        {customers.length > 0 ? (
+                                            customers.map(customer => (
+                                                <div key={customer.id} style={styles.customerCard}>
+                                                    <div style={styles.customerRow}><span style={styles.customerLabel}>Name</span><span>{customer.firstName} {customer.lastName}</span></div>
+                                                    <div style={styles.customerRow}><span style={styles.customerLabel}>Mobile</span><span>{customer.mobile}</span></div>
+                                                    <div style={styles.customerRow}><span style={styles.customerLabel}>Stage</span><span>{customer.siteStage || "-"}</span></div>
+                                                    <div style={styles.customerRow}><span style={styles.customerLabel}>Source</span><span>{customer.source || "-"}</span></div>
+                                                    <div style={styles.customerRow}><span style={styles.customerLabel}>Location</span><span>{customer.locationLink ? <a href={customer.locationLink} target="_blank" rel="noreferrer">Open Map</a> : "-"}</span></div>
+                                                    <div style={styles.customerRow}><span style={styles.customerLabel}>Image</span>{customer.image1 ? <img src={customer.image1} alt="" style={styles.thumbnail} /> : "No Image"}</div>
+                                                    <div style={styles.customerActions}>
+                                                        <button style={{ ...styles.viewButton, ...styles.mobileButton }} onClick={() => viewImages(customer)}>Images</button>
+                                                        <button style={{ ...styles.shareButton, ...styles.mobileButton }} onClick={() => shareCustomer(customer)}>Share</button>
+                                                    </div>
+                                                </div>
                                             ))
+                                        ) : (
+                                            <div style={styles.emptyState}>No customers found for this city.</div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div style={styles.tableWrapper}>
+                                        <table style={styles.table}>
 
-                                            ) : (
+                                            <thead>
 
                                                 <tr>
 
-                                                    <td colSpan="9" style={{ padding: "20px", textAlign: "center", color: "#666" }}>
+                                                    <th style={styles.th}>ID</th>
 
-                                                        No customers found for this city.
+                                                    <th style={styles.th}>Image</th>
 
-                                                    </td>
+                                                    <th style={styles.th}>Name</th>
+
+                                                    <th style={styles.th}>Mobile</th>
+
+                                                    <th style={styles.th}>Stage</th>
+
+                                                    <th style={styles.th}>Source</th>
+
+                                                    <th style={styles.th}>Location</th>
+
+                                                    <th style={styles.th}>Images</th>
+
+                                                    <th style={styles.th}>Share</th>
 
                                                 </tr>
 
-                                            )
+                                            </thead>
 
-                                        }
+                                            <tbody>
 
-                                    </tbody>
+                                                {
 
-                                </table>
+                                                    customers.length > 0 ? (
+
+                                                        customers.map(customer=>(
+
+                                                            <tr key={customer.id}>
+
+                                                            <td style={styles.td}>
+                                                                {customer.id}
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                {
+
+                                                                    customer.image1 ?
+
+                                                                    <img
+
+                                                                        src={customer.image1}
+
+                                                                        alt=""
+
+                                                                        style={styles.thumbnail}
+
+                                                                    />
+
+                                                                    :
+
+                                                                    "No Image"
+
+                                                                }
+
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                {customer.firstName} {customer.lastName}
+
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                {customer.mobile}
+
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                {customer.siteStage}
+
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                {customer.source}
+
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                <a
+
+                                                                    href={customer.locationLink}
+
+                                                                    target="_blank"
+
+                                                                    rel="noreferrer"
+
+                                                                >
+
+                                                                    Open Map
+
+                                                                </a>
+
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                <button
+
+                                                                    style={styles.viewButton}
+
+                                                                    onClick={()=>viewImages(customer)}
+
+                                                                >
+
+                                                                    View Images
+
+                                                                </button>
+
+                                                            </td>
+
+                                                            <td style={styles.td}>
+
+                                                                <button
+
+                                                                    style={styles.shareButton}
+
+                                                                    onClick={()=>shareCustomer(customer)}
+
+                                                                >
+
+                                                                    Share
+
+                                                                </button>
+
+                                                            </td>
+
+                                                        </tr>
+
+                                                    ))
+
+                                                    ) : (
+
+                                                        <tr>
+
+                                                            <td colSpan="9" style={{ padding: "20px", textAlign: "center", color: "#666" }}>
+
+                                                                No customers found for this city.
+
+                                                            </td>
+
+                                                        </tr>
+
+                                                    )
+
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                )}
 
                             </>
 
@@ -605,7 +642,9 @@ padding:"30px",
 
 borderRadius:"12px",
 
-width:"80%",
+width:"90%",
+
+maxWidth:"700px",
 
 maxHeight:"90%",
 
@@ -655,6 +694,54 @@ borderRadius:"5px",
 
 cursor:"pointer"
 
+},
+
+cardsList:{
+	display:"flex",
+	flexDirection:"column",
+	gap:"12px",
+	marginTop:"20px"
+},
+
+customerCard:{
+	background:"white",
+	border:"1px solid #e5e7eb",
+	borderRadius:"10px",
+	padding:"14px",
+	boxShadow:"0 2px 6px rgba(0,0,0,0.05)"
+},
+
+customerRow:{
+	display:"flex",
+	justifyContent:"space-between",
+	gap:"10px",
+	marginBottom:"8px",
+	fontSize:"14px"
+},
+
+customerLabel:{
+	fontWeight:"700",
+	color:"#374151"
+},
+
+customerActions:{
+	display:"flex",
+	gap:"8px",
+	marginTop:"10px"
+},
+
+mobileButton:{
+	flex:1,
+	padding:"8px 10px"
+},
+
+emptyState:{
+	background:"white",
+	border:"1px solid #e5e7eb",
+	borderRadius:"10px",
+	padding:"20px",
+	textAlign:"center",
+	color:"#666"
 }
 
 };
