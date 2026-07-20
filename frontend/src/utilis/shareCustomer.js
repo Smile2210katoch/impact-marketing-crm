@@ -8,16 +8,30 @@ function buildCustomerShareText(customers) {
                 .join(" ")
                 .trim();
 
+            const imageUrls = [
+                customer.image1,
+                customer.image2,
+                customer.image3,
+                customer.image4,
+                customer.image5
+            ].filter(Boolean);
+
             const lines = [
                 `${customerList.length > 1 ? `${index + 1}. ` : ""}Customer Details`,
                 `Name : ${name || "-"}`,
                 `Customer Type : ${customer.customerType || "-"}`,
                 `Mobile : ${customer.mobile || "-"}`,
+                `House No : ${customer.houseNo || "-"}`,
+                `Street / Phase / Sector : ${customer.street || "-"}`,
                 `City : ${customer.city || "-"}`,
                 `State : ${customer.state || "-"}`,
+                `Architect Name : ${customer.architectName || "-"}`,
+                `Architect Mobile : ${customer.architectMobile || "-"}`,
                 `Site Stage : ${customer.siteStage || "-"}`,
+                `Enquiry Type : ${customer.enquiryType || "-"}`,
                 `Source : ${customer.source || "-"}`,
-                `Google Map : ${customer.locationLink || "-"}`
+                `Google Map : ${customer.locationLink || "-"}`,
+                `Images : ${imageUrls.length > 0 ? imageUrls.join(" | ") : "No images uploaded"}`
             ];
 
             return lines.join("\n");

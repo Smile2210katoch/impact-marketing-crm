@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import PageWrapper from "../components/PageWrapper";
 import Footer from "../components/Footer";
 import EmptyState from "../components/EmptyState";
+import { shareCustomerDetails } from "../utilis/shareCustomer";
 function ManageCustomers() {
 
     const [customers, setCustomers] = useState([]);
@@ -312,9 +313,7 @@ function ManageCustomers() {
         }
 
         const selectedCustomers = customers.filter((customer) => selectedCustomerIds.includes(customer.id));
-        const shareUrl = `https://wa.me/?text=${encodeURIComponent(selectedCustomers.map((customer) => `${customer.firstName} ${customer.lastName} - ${customer.mobile || "-"}`).join("\n"))}`;
-
-        window.open(shareUrl, "_blank", "noopener,noreferrer");
+        await shareCustomerDetails(selectedCustomers);
     }
 
     async function updateCustomer(){
